@@ -3,7 +3,7 @@
 
 interface shunt_fringe_if ();
 
-   localparam N=8;
+   localparam N=9;
    typedef bit[N-1:0] data_in_t;
   
    
@@ -670,7 +670,7 @@ interface shunt_fringe_if ();
       /* verilator lint_on WIDTH */
       shunt_dpi_send_header(my_socket,h_);
       //
-      signals_db[index].data_valid = DATA_VALID_PUT;
+      signals_db[index].data_valid = DATA_VALID_GET;
       
       return success;
    endfunction : fringe_get
