@@ -1,2 +1,1 @@
-cd ../bin
-obj_dir/Vshunt_verilator_dpi
+cd ../bin;obj_dir/Vshunt_verilator_dpi | tee target.log

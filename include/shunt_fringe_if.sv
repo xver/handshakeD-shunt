@@ -562,10 +562,6 @@ interface shunt_fringe_if ();
       
    endfunction : print_reg_header
    
-
-   
-
-   
    //put & get
    
    function bit fringe_put (	   
@@ -679,8 +675,14 @@ interface shunt_fringe_if ();
       
       return success;
    endfunction : fringe_get
+
+   function void set_data_valid_get(int index);
+      signals_db[index].data_valid = FRNG_DATA_VALID_GET; 
+   endfunction //
    
-  
+   function void set_data_valid_idle(int index);
+      signals_db[index].data_valid = FRNG_DATA_IDLE;
+   endfunction //
    
 /* -----\/----- EXCLUDED -----\/-----
   function bit shunt_get_bit_req ( 
