@@ -3,7 +3,7 @@ make SIM=verilator build_sv
 make SIM=verilator run_initiator&
 sleep 15
 make SIM=verilator run_target
-egrep '(fringe_put)' ~/workspace/Shunt/examples/sv/handshakeD-shunt/initiator/bin/initiator.log > initiator_put.log
-egrep '(fringe_get)' ~/workspace/Shunt/examples/sv/handshakeD-shunt/initiator/bin/initiator.log > initiator_get.log
-egrep '(fringe_put)' ~/workspace/Shunt/examples/sv/handshakeD-shunt/target/bin/target.log > target_put.log
-egrep '(fringe_get)' ~/workspace/Shunt/examples/sv/handshakeD-shunt/target/bin/target.log > target_get.log
+egrep '(fringe_put)' ../initiator/bin/initiator.log > initiator_put.log
+egrep '(fringe_get)' ../initiator/bin/initiator.log > initiator_get.log
+egrep '(fringe_put)' ../target/bin/target.log > target_put.log
+egrep '(fringe_get)' ../target/bin/target.log > target_get.log
