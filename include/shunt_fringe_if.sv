@@ -1,7 +1,7 @@
 /* verilator lint_off UNUSED */
 /* verilator lint_off UNDRIVEN */
 
-interface shunt_fringe_if ();
+interface shunt_fringe_if (input clk_i);
 
    localparam N=9;
    typedef bit[N-1:0] data_in_t;
@@ -62,7 +62,11 @@ interface shunt_fringe_if ();
    string 		i_am="NA";
    int 			my_socket=0;
    int 			sim_id=0;
-   
+   longint              clk_i_cnt=0;
+ 
+   always @(posedge clk_i) begin
+     clk_i_cnt<=clk_i_cnt+1;
+   end
    
    //
    
@@ -611,7 +615,7 @@ interface shunt_fringe_if ();
 	 /* verilator lint_off WIDTH */
 	 data_ =  data_in_t'(data_payloads_db[i]);
 	 /* verilator lint_on WIDTH */
-	 $display("%s data_=%h data_payloads_db[%0d]= %h",s_me,data_,i,data_payloads_db[i]);
+	 $display("%s data_=%h data_payloads_db[%0d]= %h @%0d",s_me,data_,i,data_payloads_db[i],get_time());
 	 Result = shunt_dpi_send_long(my_socket,data_);
 	 if (Result<=0)  success =0;
       end // for (i=index_payload;i<index_payload+signals_db[index].signal_size;i++)
@@ -626,6 +630,11 @@ interface shunt_fringe_if ();
       
    endfunction : fringe_put
    
+   function longint get_time();
+      return clk_i_cnt;
+   endfunction : get_time
+   
+  
    function bit fringe_get ();
       
       typedef bit[N-1:0] data_in_t;
@@ -654,14 +663,14 @@ interface shunt_fringe_if ();
       //      
       //$display("%s index=%0d ",s_me,index);
       //
-      
+
       for(i=index_payload;i<index_payload+signals_db[index].signal_size;i++) begin    
 	 Result = shunt_dpi_recv_long(my_socket,data_);
 	 /* verilator lint_off WIDTH */
 	 if (Result>0) data_payloads_db[i] =  longint'(data_);
 	 /* verilator lint_on WIDTH */
 	 else  success =0;
-	 $display("%s data_=%h data_payloads_db[%0d]= %h",s_me,data_,i,data_payloads_db[i]);
+	 $display("%s data_=%h data_payloads_db[%0d]= %h @%0d",s_me,data_,i,data_payloads_db[i],get_time());
       end // for (i=index_payload;i<index_payload+signals_db[index].signal_size;i++)
            
       if (!success) h_.trnx_type = shunt_dpi_hash("FRNG_GET");
