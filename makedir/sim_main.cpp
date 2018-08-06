@@ -22,6 +22,7 @@ int main(int argc, char **argv, char **env) {
   while (!Verilated::gotFinish()) { 
     top->clk_i = !top->clk_i;
     top->eval(); 
+    tfp->flush();
     tfp->dump(main_time);
     main_time++;  // Time passes...
   }
