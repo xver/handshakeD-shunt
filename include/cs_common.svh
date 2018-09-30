@@ -3,19 +3,19 @@
 
 //simulation ID id
 `define SIM_ID  12345678
-//Targets
-`define N_OF_TARGETS 2
-`define INIT_TARGETS_DB string targets[`N_OF_TARGETS];\
-int targets_n_signals[`N_OF_TARGETS];\
-targets[0] = "TARGET";\
-targets_n_signals[0]=4;\
-targets[1] = "INITIATOR";\
-targets_n_signals[1]=4;
+//SrcDsts
+`define N_OF_SRCDSTS 2
+`define INIT_SRCDSTS_DB string SrcDsts[`N_OF_SRCDSTS];\
+int SrcDsts_n_signals[`N_OF_SRCDSTS];\
+SrcDsts[0] = "TARGET";\
+SrcDsts_n_signals[0]=4;\
+SrcDsts[1] = "INITIATOR";\
+SrcDsts_n_signals[1]=4;
 
 `define N_OF_SIGNALS  8
 `define N_OF_PAYLOADS 8
 `define INIT_SIGNAL_DB  string signals[`N_OF_SIGNALS];\
-string signals_targets[`N_OF_SIGNALS];\
+string signals_SrcDsts[`N_OF_SIGNALS];\
 string signals_type[`N_OF_SIGNALS];\
 int signals_n_payload[`N_OF_SIGNALS];\
 __signals_name_db[0] = "data_clk_0";\
@@ -26,14 +26,14 @@ __signals_name_db[4] = "data_clk_0";\
 __signals_name_db[5] = "data_clk_1";\
 __signals_name_db[6] = "data_clk_2";\
 __signals_name_db[7] = "data_clk_3";\
-__signals_target_name_db[0] = "TARGET";\
-__signals_target_name_db[1] = "TARGET";\
-__signals_target_name_db[2] = "TARGET";\
-__signals_target_name_db[3] = "TARGET";\
-__signals_target_name_db[4] = "INITIATOR";\
-__signals_target_name_db[5] = "INITIATOR";\
-__signals_target_name_db[6] = "INITIATOR";\
-__signals_target_name_db[7] = "INITIATOR";\
+__signals_SrcDst_name_db[0] = "SRCDST";\
+__signals_SrcDst_name_db[1] = "SRCDST";\
+__signals_SrcDst_name_db[2] = "SRCDST";\
+__signals_SrcDst_name_db[3] = "SRCDST";\
+__signals_SrcDst_name_db[4] = "INITIATOR";\
+__signals_SrcDst_name_db[5] = "INITIATOR";\
+__signals_SrcDst_name_db[6] = "INITIATOR";\
+__signals_SrcDst_name_db[7] = "INITIATOR";\
 signals_type[0] = "SHUNT_BIT";\
 signals_type[1] = "SHUNT_BIT";\
 signals_type[2] = "SHUNT_BIT";\

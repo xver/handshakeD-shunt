@@ -14,16 +14,16 @@ interface shunt_fringe_if (input clk_i);
 `include "cs_common.svh"
    import shunt_dpi_pkg::*;
   
-   typedef enum  {FRNG_TARGET_IDLE, FRNG_TARGET_ACTIVE, FRNG_TARGET_FINISH,FRNG_TARGET_STOP} fringe_target_status_e;
+   typedef enum  {FRNG_SRCDST_IDLE, FRNG_SRCDST_ACTIVE, FRNG_SRCDST_FINISH,FRNG_SRCDST_STOP} fringe_SrcDst_status_e;
    typedef enum  {FRNG_DATA_IDLE,FRNG_DATA_VALID_GET,FRNG_DATA_VALID_PUT} fringe_data_valid_e;
    typedef enum  {FRNG_NO_PRINT,FRNG_PRINT} fringe_signal_debug_e;
 
    /* verilator lint_off UNPACKED */ 
    typedef struct{ 
-      longint 	 target_id;
+      longint 	 SrcDst_id;
       int 	 n_signals;
-      fringe_target_status_e   status;        
-   } fringe_targets_descriptor_t;
+      fringe_SrcDst_status_e   status;        
+   } fringe_SrcDsts_descriptor_t;
    
    typedef struct{ 
       longint 	    data_type;
@@ -47,13 +47,13 @@ interface shunt_fringe_if (input clk_i);
    
    //Sim DB
    fringe_signals_descriptor_t Signal;
-   fringe_targets_descriptor_t Target;
-   //Targets DB
-   fringe_targets_descriptor_t targets_db[`N_OF_TARGETS];
-   string 	__targets_name_db [`N_OF_TARGETS];
+   fringe_SrcDsts_descriptor_t SrcDst;
+   //SrcDsts DB
+   fringe_SrcDsts_descriptor_t SrcDsts_db[`N_OF_SRCDSTS];
+   string 	__SrcDsts_name_db [`N_OF_SRCDSTS];
    //Signals DB
    fringe_signals_descriptor_t signals_db            [`N_OF_SIGNALS];
-   string 	        __signals_target_name_db[`N_OF_SIGNALS];
+   string 	        __signals_SrcDst_name_db[`N_OF_SIGNALS];
    string 	        __signals_name_db       [`N_OF_SIGNALS];
    //Paylod db
    longint 		data_payloads_db[`N_OF_PAYLOADS];
@@ -108,42 +108,42 @@ interface shunt_fringe_if (input clk_i);
    ///////////////
    
    
-   //Targets DB
-   function  bit init_targets_db();
+   //SrcDsts DB
+   function  bit init_SrcDsts_db();
       bit success;
-      `INIT_TARGETS_DB
+      `INIT_SRCDSTS_DB
       success = 1;
-      for(int i=0;i<`N_OF_TARGETS;i++) begin
-	 targets_db[i].target_id  = {$random,$random};
-	 targets_db[i].n_signals  = targets_n_signals[i];
-	 targets_db[i].status     = FRNG_TARGET_IDLE; //not active
+      for(int i=0;i<`N_OF_SRCDSTS;i++) begin
+	 SrcDsts_db[i].SrcDst_id  = {$random,$random};
+	 SrcDsts_db[i].n_signals  = SrcDsts_n_signals[i];
+	 SrcDsts_db[i].status     = FRNG_SRCDST_IDLE; //not active
 	 //   
-	 __targets_name_db[i]       = targets[i];
-	 if (__targets_name_db[i] == "INITIATOR") targets_db[i].status = FRNG_TARGET_ACTIVE;
+	 __SrcDsts_name_db[i]       = SrcDsts[i];
+	 if (__SrcDsts_name_db[i] == "INITIATOR") SrcDsts_db[i].status = FRNG_SRCDST_ACTIVE;
       end
       return success; 
-     endfunction : init_targets_db
+     endfunction : init_SrcDsts_db
 
-   function  bit print_targets_db();
+   function  bit print_SrcDsts_db();
       bit success;
       success = 1;
-      for(int i=0;i<`N_OF_TARGETS;i++) begin
-	 //print_target_descr(targets_db[i]);
-	 $display("%s targets_db[%0d].target_id  =%0h",i_am,i,targets_db[i].target_id);
-	 $display("%s targets_db[%0d].n_signals =%0d",i_am,i,targets_db[i].n_signals);
-	 $display("%s targets_db[%0d].status  =%s",i_am,i,targets_db[i].status.name());
-	 $display("%s __target_name_db[%0d]     =%s\n",i_am,i,__targets_name_db[i]);
+      for(int i=0;i<`N_OF_SRCDSTS;i++) begin
+	 //print_SrcDst_descr(SrcDsts_db[i]);
+	 $display("%s SrcDsts_db[%0d].SrcDst_id  =%0h",i_am,i,SrcDsts_db[i].SrcDst_id);
+	 $display("%s SrcDsts_db[%0d].n_signals =%0d",i_am,i,SrcDsts_db[i].n_signals);
+	 $display("%s SrcDsts_db[%0d].status  =%s",i_am,i,SrcDsts_db[i].status.name());
+	 $display("%s __SrcDst_name_db[%0d]     =%s\n",i_am,i,__SrcDsts_name_db[i]);
       end
       return success; 
-   endfunction : print_targets_db
+   endfunction : print_SrcDsts_db
    
-   function  print_target_descr(input fringe_targets_descriptor_t Trg,input string Name="Trg");
-      $display("%s %s.target_id  =%0h",i_am,Name,Trg.target_id);
+   function  print_SrcDst_descr(input fringe_SrcDsts_descriptor_t Trg,input string Name="Trg");
+      $display("%s %s.SrcDst_id  =%0h",i_am,Name,Trg.SrcDst_id);
       $display("%s %s.n_signals =%0d",i_am,Name,Trg.n_signals);
       $display("%s %s.status =%s",i_am,Name,Trg.status.name()); 
-   endfunction : print_target_descr
+   endfunction : print_SrcDst_descr
 
-   function  int check_repetition_targets_db(string Name,int N_repetition=1 );
+   function  int check_repetition_SrcDsts_db(string Name,int N_repetition=1 );
       int repetition_indx;
       int repetition_entry;
       
@@ -151,67 +151,67 @@ interface shunt_fringe_if (input clk_i);
       repetition_entry=0;
       
       //find repetition entry
-      for(int i=0;i<`N_OF_TARGETS;i++) begin
-	 if (__targets_name_db[i] == Name) ++repetition_entry;
+      for(int i=0;i<`N_OF_SRCDSTS;i++) begin
+	 if (__SrcDsts_name_db[i] == Name) ++repetition_entry;
 	 if (repetition_entry > N_repetition) repetition_indx = i;
       end
       return repetition_indx;    
-   endfunction : check_repetition_targets_db
+   endfunction : check_repetition_SrcDsts_db
    
    
 
-   function  int check_idle_entry_targets_db();
+   function  int check_idle_entry_SrcDsts_db();
       int idle_entry=-1;
       //find idle entry
-      for(int i=0;i<`N_OF_TARGETS;i++) begin
-	 if (targets_db[i].status==FRNG_TARGET_IDLE && idle_entry<0) idle_entry = i;
-      end // for (int i=0;i<`N_OF_TARGETS;i++)
+      for(int i=0;i<`N_OF_SRCDSTS;i++) begin
+	 if (SrcDsts_db[i].status==FRNG_SRCDST_IDLE && idle_entry<0) idle_entry = i;
+      end // for (int i=0;i<`N_OF_SRCDSTS;i++)
       return idle_entry; 
-   endfunction : check_idle_entry_targets_db
+   endfunction : check_idle_entry_SrcDsts_db
    
    
    
-   function  int get_index_by_name_targets_db(string Name);
+   function  int get_index_by_name_SrcDsts_db(string Name);
       string s_me;
       int    index;
    
       index = -1;
-      s_me = "get_index_by_name_targets_db()";
+      s_me = "get_index_by_name_SrcDsts_db()";
       
-      for(int i=0;i<`N_OF_TARGETS;i++) begin
-	 if (__targets_name_db[i] == Name && index<0) index = i;
-      end // for (int i=0;i<`N_OF_TARGETS;i++)
+      for(int i=0;i<`N_OF_SRCDSTS;i++) begin
+	 if (__SrcDsts_name_db[i] == Name && index<0) index = i;
+      end // for (int i=0;i<`N_OF_SRCDSTS;i++)
       return index;
-   endfunction : get_index_by_name_targets_db
+   endfunction : get_index_by_name_SrcDsts_db
 
-   function  int get_index_by_hash_targets_db(longint Name_hash);
+   function  int get_index_by_hash_SrcDsts_db(longint Name_hash);
       string s_me;
       int    index;
       longint hash_;
          
       index = -1;
-      s_me = "get_index_by_hash_targets_db()";
+      s_me = "get_index_by_hash_SrcDsts_db()";
       
-      for(int i=0;i<`N_OF_TARGETS;i++) begin
-	 hash_ =shunt_dpi_hash(__targets_name_db[i]); 
+      for(int i=0;i<`N_OF_SRCDSTS;i++) begin
+	 hash_ =shunt_dpi_hash(__SrcDsts_name_db[i]); 
 	 if (hash_ == Name_hash && index<0) index = i;
-      end // for (int i=0;i<`N_OF_TARGETS;i++)
+      end // for (int i=0;i<`N_OF_SRCDSTS;i++)
       return index;
-   endfunction : get_index_by_hash_targets_db
+   endfunction : get_index_by_hash_SrcDsts_db
    
 
    
-   function  string get_name_by_index_targets_db(int index);
+   function  string get_name_by_index_SrcDsts_db(int index);
       
       string s_me;
       string Name;
       
-      s_me = "get_index_by_name_targets_db()";
+      s_me = "get_index_by_name_SrcDsts_db()";
       Name ="NA";
-      if (index <`N_OF_TARGETS) Name = __targets_name_db[index];
+      if (index <`N_OF_SRCDSTS) Name = __SrcDsts_name_db[index];
       
       return Name;
-   endfunction : get_name_by_index_targets_db
+   endfunction : get_name_by_index_SrcDsts_db
    
    //Signals DB
    
@@ -233,7 +233,7 @@ interface shunt_fringe_if (input clk_i);
       foreach(signals_db[i])
 	begin
 	   signals_db[i].data_type  = shunt_dpi_hash(signals_type[i]);
-	   signals_db[i].signal_id  = shunt_dpi_hash({__signals_target_name_db[i],".",__signals_name_db[i]});
+	   signals_db[i].signal_id  = shunt_dpi_hash({__signals_SrcDst_name_db[i],".",__signals_name_db[i]});
 	   signals_db[i].signal_size = signals_n_payload[i];
 	   signals_db[i].data_valid = FRNG_DATA_IDLE;
 	   signals_db[i].timestamp  = 0;
@@ -269,9 +269,9 @@ interface shunt_fringe_if (input clk_i);
       for(int i=0;i<`N_OF_SIGNALS;i++) begin
 	 if (signals_db[i].debug == FRNG_PRINT)
 	   begin
-	      //print_target_descr(targets_db[i]);
+	      //print_SrcDst_descr(SrcDsts_db[i]);
 	      $display("%s __signals_name_db[%0d]       = %s",i_am,i,__signals_name_db[i]);
-	      $display("%s __signals_target_name_db[%0d]= %s",i_am,i,__signals_target_name_db[i]);
+	      $display("%s __signals_SrcDst_name_db[%0d]= %s",i_am,i,__signals_SrcDst_name_db[i]);
 	      $display("%s signals_db[%0d].data_type  = %0h",i_am,i,signals_db[i].data_type);
 	      $display("%s signals_db[%0d].signal_id  = %0h",i_am,i,signals_db[i].signal_id);
 	      $display("%s signals_db[%0d].index_payloads_db = %0d",i_am,i,signals_db[i].index_payloads_db);
@@ -323,7 +323,7 @@ interface shunt_fringe_if (input clk_i);
    endfunction : get_index_by_signal_id_payloads_db
    
    
-   function  int check_repetition_signals_db(string Signal_name,string Target_name,int N_repetition=1 );
+   function  int check_repetition_signals_db(string Signal_name,string SrcDst_name,int N_repetition=1 );
       int repetition_indx;
       int repetition_entry;
       
@@ -332,7 +332,7 @@ interface shunt_fringe_if (input clk_i);
       
       //find repetition entry
       for(int i=0;i<`N_OF_SIGNALS;i++) begin
-	 if (__signals_name_db[i] == Signal_name && __signals_target_name_db[i] == Target_name ) ++repetition_entry;
+	 if (__signals_name_db[i] == Signal_name && __signals_SrcDst_name_db[i] == SrcDst_name ) ++repetition_entry;
 	 if (repetition_entry > N_repetition) repetition_indx = i;
       end
       return repetition_indx;    
@@ -347,7 +347,7 @@ interface shunt_fringe_if (input clk_i);
       return free_entry; 
    endfunction : check_free_entry_signals_db
 
-   function  int get_index_by_name_signals_db(string Name_target, string Name_signal);
+   function  int get_index_by_name_signals_db(string Name_SrcDst, string Name_signal);
       string s_me;
       int    index;
       string Name_;
@@ -355,12 +355,12 @@ interface shunt_fringe_if (input clk_i);
       index = -1;
       s_me = "get_index_by_name_signals_db()";
       //
-      Name_  = {Name_target,".",Name_signal};
+      Name_  = {Name_SrcDst,".",Name_signal};
       for(int i=0;i<`N_OF_SIGNALS;i++) begin
-	 NameDb_= {__signals_target_name_db[i],".",__signals_name_db[i]}; 
+	 NameDb_= {__signals_SrcDst_name_db[i],".",__signals_name_db[i]}; 
 	 if (Name_ ==  NameDb_ && index<0) index = i;
-	 //$display("%s index=%0d,__signals_name_db[%0d]=%s, __signals_target_name_db[%0d]=%s,index=%0d vs Name_target=%s,Name_signal=%s Name_=%s",s_me,index,i,__signals_name_db[i],i,__signals_target_name_db[i],index,Name_target,Name_signal,Name_);
-      end // for (int i=0;i<`N_OF_TARGETS;i++)
+	 //$display("%s index=%0d,__signals_name_db[%0d]=%s, __signals_SrcDst_name_db[%0d]=%s,index=%0d vs Name_SrcDst=%s,Name_signal=%s Name_=%s",s_me,index,i,__signals_name_db[i],i,__signals_SrcDst_name_db[i],index,Name_SrcDst,Name_signal,Name_);
+      end // for (int i=0;i<`N_OF_SRCDSTS;i++)
       return index;
    endfunction : get_index_by_name_signals_db
 
@@ -372,8 +372,8 @@ interface shunt_fringe_if (input clk_i);
       s_me = "get_index_by_full_name_signals_db";
       
       for(int i=0;i<`N_OF_SIGNALS;i++) begin
-	 if (Name == {__signals_target_name_db[i],".",__signals_name_db[i]} && index<0) index = i;
-      end // for (int i=0;i<`N_OF_TARGETS;i++)
+	 if (Name == {__signals_SrcDst_name_db[i],".",__signals_name_db[i]} && index<0) index = i;
+      end // for (int i=0;i<`N_OF_SRCDSTS;i++)
       return index;
     endfunction : get_index_by_full_name_signals_db
    
@@ -387,7 +387,7 @@ interface shunt_fringe_if (input clk_i);
       s_me = "get_index_by_hash_signals_db()";
       
       for(int i=0;i<`N_OF_SIGNALS;i++) begin
-	 hash_ =shunt_dpi_hash({__signals_target_name_db[i],".",__signals_name_db[i]}); 
+	 hash_ =shunt_dpi_hash({__signals_SrcDst_name_db[i],".",__signals_name_db[i]}); 
 	 if (hash_ == Name_hash && index<0) index = i;
       end // for (int i=0;i<`N_OF_SIGNALS;i++)
       return index;
@@ -405,7 +405,7 @@ interface shunt_fringe_if (input clk_i);
        s_me = "get_index_by_full_name_hash_signals_db";
        Name_hash =shunt_dpi_hash(full_Name);
        for(int i=0;i<`N_OF_SIGNALS;i++) begin
-	  hash_ =shunt_dpi_hash({__signals_target_name_db[i],".",__signals_name_db[i]}); 
+	  hash_ =shunt_dpi_hash({__signals_SrcDst_name_db[i],".",__signals_name_db[i]}); 
 	  if (hash_ == Name_hash && index<0) index = i;
        end // for (int i=0;i<`N_OF_SIGNALS;i++)
       return index;
@@ -421,7 +421,7 @@ interface shunt_fringe_if (input clk_i);
       
       for(int i=0;i<`N_OF_SIGNALS;i++) begin
 	 if (signals_db[i].signal_id == signal_id  && index<0) index = i;
-	 //$display("%s index=%0d,signals_db[%0d].signal_id=%h,__signals_name_db[%0d]=%s, __signals_target_name_db[%0d]=%s,index=%0d vs signal_id=%h",s_me,index,i,signals_db[i].signal_id,i,__signals_name_db[i],i,__signals_target_name_db[i],index,signal_id);
+	 //$display("%s index=%0d,signals_db[%0d].signal_id=%h,__signals_name_db[%0d]=%s, __signals_SrcDst_name_db[%0d]=%s,index=%0d vs signal_id=%h",s_me,index,i,signals_db[i].signal_id,i,__signals_name_db[i],i,__signals_SrcDst_name_db[i],index,signal_id);
       end // for (int i=0;i<`N_OF_SIGNALS;i++)
       return index;
    endfunction : get_index_by_signal_id_signals_db
@@ -440,17 +440,17 @@ interface shunt_fringe_if (input clk_i);
    endfunction : get_signal_name_by_index_signals_db
    
 
-   function  string get_target_name_by_index_signals_db(int index);
+   function  string get_SrcDst_name_by_index_signals_db(int index);
       
       string s_me;
       string Name;
       
-      s_me = "get_target_name_by_index_signals_db";
+      s_me = "get_SrcDst_name_by_index_signals_db";
       Name ="NA";
-      if (index <`N_OF_SIGNALS) Name = __signals_target_name_db[index];
+      if (index <`N_OF_SIGNALS) Name = __signals_SrcDst_name_db[index];
       
       return Name;
-   endfunction : get_target_name_by_index_signals_db
+   endfunction : get_SrcDst_name_by_index_signals_db
      
    
    function  string get_full_name_by_index_signals_db(int index);
@@ -460,7 +460,7 @@ interface shunt_fringe_if (input clk_i);
       
       s_me = "get_full_name_by_index_signals_db";
       Name ="NA";
-      if (index <`N_OF_SIGNALS) Name = {__signals_target_name_db[index],".",__signals_name_db[index]};
+      if (index <`N_OF_SIGNALS) Name = {__signals_SrcDst_name_db[index],".",__signals_name_db[index]};
       
       return Name;
    endfunction : get_full_name_by_index_signals_db
@@ -470,7 +470,7 @@ interface shunt_fringe_if (input clk_i);
    //TCP init
    function void tcp_init();
       if(i_am == "INITIATOR") my_socket = init_initiator(`MY_PORT);
-      if(i_am != "INITIATOR") my_socket = init_target(`MY_PORT, `MY_HOST);
+      if(i_am != "INITIATOR") my_socket = init_SrcDst(`MY_PORT, `MY_HOST);
       //
       if (my_socket >0 )  $display("\n%s: socket=%0d",i_am,my_socket); 
       else $display("\n %s ERROR : socket=%0d",i_am,my_socket);
@@ -485,51 +485,51 @@ interface shunt_fringe_if (input clk_i);
       end
    endfunction : init_initiator
    
-   function int init_target(int portno,string hostname);
+   function int init_SrcDst(int portno,string hostname);
       int    socket_id;
       socket_id = 0;
       socket_id = shunt_dpi_target_init(portno,hostname);
       return socket_id;
-   endfunction : init_target
+   endfunction : init_SrcDst
    
    //Registration
-   //Target
+   //SrcDst
 
-   function bit target_registration_request(inout cs_header_t h_,input string target_name);
+   function bit SrcDst_registration_request(inout cs_header_t h_,input string SrcDst_name);
       bit    success;
       success = 0;
       h_.trnx_type  = shunt_dpi_hash("FRNG_REG_REQ");
       h_.data_type  = shunt_dpi_hash("SHUNT_HEADER_ONLY");
-      h_.trnx_id    = shunt_dpi_hash(target_name);
+      h_.trnx_id    = shunt_dpi_hash(SrcDst_name);
       h_.n_payloads = sim_id;
       shunt_dpi_send_header(my_socket,h_);
       //
       shunt_dpi_recv_header(my_socket,h_);
       if (h_.trnx_type == shunt_dpi_hash("FRNG_REG_ACK") && h_.n_payloads == sim_id && h_.trnx_id >= 0 ) success = 1;
       return success;
-   endfunction : target_registration_request
+   endfunction : SrcDst_registration_request
    
    
    function bit initiator_registration(inout cs_header_t h_);
       bit    success;
-      fringe_targets_descriptor_t Trg;
+      fringe_SrcDsts_descriptor_t Trg;
       int    index;
       
       success = 0;
       shunt_dpi_recv_header(my_socket,h_);
       
-      index = get_index_by_hash_targets_db(h_.trnx_id);
+      index = get_index_by_hash_SrcDsts_db(h_.trnx_id);
       if (h_.trnx_type ==shunt_dpi_hash("FRNG_REG_REQ") && h_.n_payloads == sim_id)
 	begin 
 	   h_.trnx_type  = shunt_dpi_hash("FRNG_REG_ACK");
-	   if(index >= 0 && targets_db[index].status==FRNG_TARGET_IDLE) h_.trnx_id = targets_db[index].target_id;
+	   if(index >= 0 && SrcDsts_db[index].status==FRNG_SRCDST_IDLE) h_.trnx_id = SrcDsts_db[index].SrcDst_id;
 	   else  h_.trnx_id = -1;
 	   h_.data_type  = shunt_dpi_hash("SHUNT_HEADER_ONLY");
 	   h_.n_payloads = sim_id;
 	   shunt_dpi_send_header(my_socket,h_);
 	   if(h_.trnx_id>=0) begin
 	      success = 1;
-	      targets_db[index].status=FRNG_TARGET_ACTIVE;
+	      SrcDsts_db[index].status=FRNG_SRCDST_ACTIVE;
 	     end
 	end // if (h_.trnx_type ==shunt_dpi_hash("FRNG_REG_REQ") && h_.n_payloads == sim_id)
       return success;

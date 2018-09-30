@@ -1,3 +1,5 @@
+rm -r ../target/bin/*
+rm -r ../initiator/bin/*
 make -f ../../../../utils/makefile.init 
 make SIM=verilator build_sv
 make SIM=verilator run_initiator&
