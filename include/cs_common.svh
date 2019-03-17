@@ -1,53 +1,65 @@
+//SrcDsts
+`ifndef  FRNG_N_OF_SRCDSTS
+ `define FRNG_N_OF_SRCDSTS  2
+`endif
+
+`ifndef  FRNG_N_OF_SIGNALS
+ `define FRNG_N_OF_SIGNALS  8
+`endif
+
+`ifndef  FRNG_MAX_N_OF_BITS_PER_SIGNAL
+ `define FRNG_MAX_N_OF_BITS_PER_SIGNAL 1024 
+`endif
+
+`ifndef  FRNG_MAX_N_OF_PAYLOADS_PER_SIGNAL
+ `define FRNG_MAX_N_OF_PAYLOADS_PER_SIGNAL 16
+`endif
+
+`ifndef  FRNG_N_OF_BITS_PER_PAYLOAD
+ `ifdef  SHUNT_VERILATOR_DPI_H 
+  `define FRNG_N_OF_BITS_PER_PAYLOAD 64
+ `endif 
+ `ifndef SHUNT_VERILATOR_DPI_H   
+  `define FRNG_N_OF_BITS_PER_PAYLOAD `FRNG_MAX_N_OF_BITS_PER_SIGNAL
+ `endif
+`endif
+
+`ifndef  FRNG_N_OF_PAYLOADS
+ `define FRNG_N_OF_PAYLOADS (`FRNG_N_OF_SIGNALS*(`FRNG_MAX_N_OF_BITS_PER_SIGNAL/`FRNG_N_OF_BITS_PER_PAYLOAD))
+`endif
+
+
 `define MY_HOST "localhost"
 `define MY_PORT  3450
 
 //simulation ID id
 `define SIM_ID  12345678
-//SrcDsts
-`define N_OF_SRCDSTS 2
-`define INIT_SRCDSTS_DB string SrcDsts[`N_OF_SRCDSTS];\
-int SrcDsts_n_signals[`N_OF_SRCDSTS];\
-SrcDsts[0] = "TARGET";\
+
+`define INIT_SRCDSTS_DB string SrcDsts_name[`FRNG_N_OF_SRCDSTS];\
+int SrcDsts_n_signals[`FRNG_N_OF_SRCDSTS];\
+SrcDsts_name[0] = "TARGET";\
 SrcDsts_n_signals[0]=4;\
-SrcDsts[1] = "INITIATOR";\
+SrcDsts_name[1] = "INITIATOR";\
 SrcDsts_n_signals[1]=4;
 
-`define N_OF_SIGNALS  8
-`define N_OF_PAYLOADS 8
-`define INIT_SIGNAL_DB  string signals[`N_OF_SIGNALS];\
-string signals_SrcDsts[`N_OF_SIGNALS];\
-string signals_type[`N_OF_SIGNALS];\
-int signals_n_payload[`N_OF_SIGNALS];\
-__signals_name_db[0] = "data_clk_0";\
-__signals_name_db[1] = "data_clk_1";\
-__signals_name_db[2] = "data_clk_2";\
-__signals_name_db[3] = "data_clk_3";\
-__signals_name_db[4] = "data_clk_0";\
-__signals_name_db[5] = "data_clk_1";\
-__signals_name_db[6] = "data_clk_2";\
-__signals_name_db[7] = "data_clk_3";\
-__signals_SrcDst_name_db[0] = "SRCDST";\
-__signals_SrcDst_name_db[1] = "SRCDST";\
-__signals_SrcDst_name_db[2] = "SRCDST";\
-__signals_SrcDst_name_db[3] = "SRCDST";\
-__signals_SrcDst_name_db[4] = "INITIATOR";\
-__signals_SrcDst_name_db[5] = "INITIATOR";\
-__signals_SrcDst_name_db[6] = "INITIATOR";\
-__signals_SrcDst_name_db[7] = "INITIATOR";\
-signals_type[0] = "SHUNT_BIT";\
-signals_type[1] = "SHUNT_BIT";\
-signals_type[2] = "SHUNT_BIT";\
-signals_type[3] = "SHUNT_BIT";\
-signals_type[4] = "SHUNT_BIT";\
-signals_type[5] = "SHUNT_BIT";\
-signals_type[6] = "SHUNT_BIT";\
-signals_type[7] = "SHUNT_BIT";\
-signals_n_payload[0] = 1;\
-signals_n_payload[1] = 1;\
-signals_n_payload[2] = 1;\
-signals_n_payload[3] = 1;\
-signals_n_payload[4] = 1;\
-signals_n_payload[5] = 1;\
-signals_n_payload[6] = 1;\
-signals_n_payload[7] = 1;
+`define INIT_SIGNAL_DB string SrcDsts_name[`FRNG_N_OF_SRCDSTS];\
+string signal_name[`FRNG_N_OF_SIGNALS];\
+string signals_SrcDsts[`FRNG_N_OF_SIGNALS];\
+int signal_type[`FRNG_N_OF_SIGNALS];\
+int signal_size[`FRNG_N_OF_SIGNALS];\
+SrcDsts_name[0] = "TARGET";\
+SrcDsts_name[1] = "INITIATOR";\
+signal_name[0] = "data_clk_0";\
+signal_name[1] = "data_clk_1";\
+signal_name[2] = "data_clk_2";\
+signal_name[3] = "data_clk_3";\
+signal_type[0] = Frng_if.SHUNT_BIT;\
+signal_type[1] = Frng_if.SHUNT_BIT;\
+signal_type[2] = Frng_if.SHUNT_BIT;\
+signal_type[3] = Frng_if.SHUNT_BIT;\
+signal_size[0] = 9;\
+signal_size[1] = 9;\
+signal_size[2] = 9;\
+signal_size[3] = 9;
+
 
