@@ -924,51 +924,52 @@ endfunction : print_signals_db
       h_.data_type  = shunt_dpi_hash(who_iam());
       h_.trnx_id    = 0;
       h_.n_payloads = sim_id;
-      shunt_dpi_send_header(socket_id,h_);
-
+      if (shunt_dpi_send_header(socket_id,h_)>0) success = 1;
+      else success =0;
+ 
       //
-      success = 0;
-      if (shunt_dpi_recv_header(socket_id,h_) >0) begin
-	 success=1;
-	 SrcDst_db_index = get_index_by_name_hash_SrcDsts_db(h_.data_type);
-	 //
-	 if (h_.trnx_type == shunt_dpi_hash("FRNG_ACK") && 
-	     h_.n_payloads == sim_id && 
-	     h_.data_type == shunt_dpi_hash(who_iam()) &&
-	     h_.trnx_id  != -1  &&h_.trnx_id  != 0 && 
-	     SrcDst_db_index>=0 &&
-	     SrcDsts_db[SrcDst_db_index].socket_id < 0 &&
-	     SrcDsts_db[SrcDst_db_index].status  == FRNG_SRCDST_IDLE &&
-	     success
-	     ) success = 1;
-	 else success = 0;
-	 
-	 if (success) begin
-	    SrcDsts_db[SrcDst_db_index].socket_id =  socket_id;
-	    SrcDsts_db[SrcDst_db_index].status    = FRNG_SRCDST_ACTIVE;
-	    SrcDsts_db[SrcDst_db_index].SrcDst_id = h_.trnx_id;
-	 end
-      
-	 success = 0;
-	 if (shunt_dpi_recv_header(socket_id,h_) >0) success=1;
-	 SrcDst_db_index = get_index_by_name_hash_SrcDsts_db(h_.data_type);
-	 //
-	 if (h_.trnx_type == shunt_dpi_hash("FRNG_ACK") && 
-	     h_.n_payloads == sim_id  &&
-	     h_.trnx_id  != -1  &&h_.trnx_id  != 0 &&
-	     success 
-	     ) success = 1;
-	 else success = 0;
-	 
-	 if (success) begin
-	    SrcDsts_db[SrcDst_db_index].socket_id =  socket_id;
-	    SrcDsts_db[SrcDst_db_index].status    = FRNG_SRCDST_ACTIVE;
-	    SrcDsts_db[SrcDst_db_index].SrcDst_id = h_.trnx_id;
-	    SrcDsts_db[SrcDst_db_index].socket_id =  socket_id;
-	    my_source = __SrcDsts_name_db[SrcDst_db_index];
-	 end
-      end // if (shunt_dpi_recv_header(socket_id,h_) >0)
-           
+      if(success) begin
+	 if (shunt_dpi_recv_header(socket_id,h_) >0) begin
+	    success=1;
+	    SrcDst_db_index = get_index_by_name_hash_SrcDsts_db(h_.data_type);
+	    //
+	    if (h_.trnx_type == shunt_dpi_hash("FRNG_ACK") && 
+		h_.n_payloads == sim_id && 
+		h_.data_type == shunt_dpi_hash(who_iam()) &&
+		h_.trnx_id  != -1  &&h_.trnx_id  != 0 && 
+		SrcDst_db_index>=0 &&
+		SrcDsts_db[SrcDst_db_index].socket_id < 0 &&
+		SrcDsts_db[SrcDst_db_index].status  == FRNG_SRCDST_IDLE &&
+		success
+		) success = 1;
+	    else success = 0;
+	    
+	    if (success) begin
+	       SrcDsts_db[SrcDst_db_index].socket_id =  socket_id;
+	       SrcDsts_db[SrcDst_db_index].status    = FRNG_SRCDST_ACTIVE;
+	       SrcDsts_db[SrcDst_db_index].SrcDst_id = h_.trnx_id;
+	    end
+	    
+	    success = 0;
+	    if (shunt_dpi_recv_header(socket_id,h_) >0) success=1;
+	    SrcDst_db_index = get_index_by_name_hash_SrcDsts_db(h_.data_type);
+	    //
+	    if (h_.trnx_type == shunt_dpi_hash("FRNG_ACK") && 
+		h_.n_payloads == sim_id  &&
+		h_.trnx_id  != -1  &&h_.trnx_id  != 0 &&
+		success 
+		) success = 1;
+	    else success = 0;
+	    
+	    if (success) begin
+	       SrcDsts_db[SrcDst_db_index].socket_id =  socket_id;
+	       SrcDsts_db[SrcDst_db_index].status    = FRNG_SRCDST_ACTIVE;
+	       SrcDsts_db[SrcDst_db_index].SrcDst_id = h_.trnx_id;
+	       SrcDsts_db[SrcDst_db_index].socket_id =  socket_id;
+	       my_source = __SrcDsts_name_db[SrcDst_db_index];
+	    end
+	 end // if (shunt_dpi_recv_header(socket_id,h_) >0)
+      end // if (success)
       $display("\n %s %s success=%0d SrcDst_db_index=%0d\n",s_me,i_am,success,SrcDst_db_index);
       //
       return success;
@@ -1010,7 +1011,7 @@ endfunction : print_signals_db
 	if (success) h_.trnx_id   = SrcDsts_db[SrcDst_db_index].SrcDst_id; //FRNG_ACK OK
 	else  h_.trnx_id   = -1;                                           //FRNG_ACK ERR
 	h_.n_payloads = sim_id;
-	shunt_dpi_send_header(socket_id,h_);
+	if(shunt_dpi_send_header(socket_id,h_)>0 && success)success=1;
 	
 	//send Src DB info
 	SrcDst_db_index = get_index_by_name_SrcDsts_db(who_iam());
@@ -1019,7 +1020,7 @@ endfunction : print_signals_db
 	if (success) h_.trnx_id   = SrcDsts_db[SrcDst_db_index].SrcDst_id; //FRNG_ACK OK
 	else  h_.trnx_id   = -1;                                           //FRNG_ACK ERR
 	h_.n_payloads = sim_id;
-	shunt_dpi_send_header(socket_id,h_);
+	if(shunt_dpi_send_header(socket_id,h_)>0 && success)success=1;  
      end // if (shunt_dpi_recv_header(socket_id,h_)>0)
      //
      $display("\n %s %s success=%0d SrcDst_db_index=%0d\n",s_me,i_am,success,SrcDst_db_index);
@@ -1270,7 +1271,7 @@ endfunction : fringe_api_get
 	 index_payload = signals_db[signals_db_index].index_payloads;
 	 $display("%s: %s SrcDst_db_index =%0d signals_db_index=%0d  SrcDst_name(source)=%s, signal_name=%s",i_am,s_me, SrcDst_db_index,signals_db_index,__SrcDsts_name_db [SrcDst_db_index], __signals_db_name[signals_db_index]);
 	 
-	 print_SrcDsts_db(SrcDst_db_index);
+	 if(!print_SrcDsts_db(SrcDst_db_index)) $display("ERROR: %s %s print_SrcDsts_db(SrcDst_db_index)",i_am,s_me);
 	 
 	 //header tenure 
 	 h_.trnx_type  = shunt_dpi_hash("FRNG_PUT");
@@ -1284,14 +1285,14 @@ endfunction : fringe_api_get
 	 //data tenure 
 	 index_payload = signals_db[signals_db_index].index_payloads;
 	 
-	 print_signals_db(signals_db_index);
+	  if(!print_signals_db(signals_db_index))$display("ERROR: %s %s print_signals_db(signals_db_index)",i_am,s_me);
 	 
 	 case (signals_db[signals_db_index].signal_type) 
 	   SHUNT_BIT: begin
 `ifdef  SHUNT_VERILATOR_DPI_H
 	      print_shunt_header(h_,"fringe_put h_");
 	      $display("%s shunt_dpi_send header SrcDsts_db[%0d].socket_id = %0d",s_me,call_id_index, SrcDsts_db[call_id_index].socket_id);
-	      shunt_dpi_send_header(SrcDsts_db[call_id_index].socket_id,h_);
+	      if(shunt_dpi_send_header(SrcDsts_db[call_id_index].socket_id,h_)<=0) success = 0;
 	      for(int i=0;i<h_.n_payloads;i++) begin
 		 $display("%s shunt_dpi_send_long signals_db_payloads[%0d].data_bit ",s_me,index_payload+i,signals_db_payloads[index_payload+i].data_bit);
 		 Result = shunt_dpi_send_long(SrcDsts_db[call_id_index].socket_id,signals_db_payloads[index_payload+i].data_bit);
@@ -1308,7 +1309,7 @@ endfunction : fringe_api_get
 	   SHUNT_LOGIC,SHUNT_REG: begin
 	      $display("\n%s ERROR !!!: %s %s is not supported",s_me,i_am,signals_db[signals_db_index].signal_type.name());
 `ifdef  SHUNT_VERILATOR_DPI_H
-	      shunt_dpi_send_header(SrcDsts_db[SrcDst_db_index].socket_id,h_);
+	      if(shunt_dpi_send_header(SrcDsts_db[SrcDst_db_index].socket_id,h_)<=0) success=0;
 	      for(int i=0;i<h_.n_payloads;i++)
 		Result = shunt_dpi_send_long(SrcDsts_db[SrcDst_db_index].socket_id,signals_db_payloads[index_payload+i].data_logic);
 `endif
@@ -1405,8 +1406,8 @@ endfunction : fringe_api_get
 `endif //  `ifndef SHUNT_VERILATOR_DPI_H
       end // if (success)
       if(success ) begin
-	 print_SrcDsts_db(SrcDst_db_index);
-	 print_signals_db(source_signals_db_index);
+	 if(!print_SrcDsts_db(SrcDst_db_index))         $display("ERROR: %s %s print_SrcDsts_db(SrcDst_db_index)",i_am,s_me);
+	 if(!print_signals_db(source_signals_db_index)) $display("ERROR: %s %s print_signals_db(source_signals_db_index)",i_am,s_me);
 	 for(int i=signals_db_index_payload;i<signals_db_index_payload+signals_db[source_signals_db_index].signal_size;i++) begin
 	    if(data_type == SHUNT_BIT)   
 	      $display("%s signals_db_payloads[%0d].%s=%0h",s_me,i,data_type.name(),signals_db_payloads[i].data_bit);
