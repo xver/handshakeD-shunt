@@ -23,6 +23,13 @@ else
 #	cd ../target/makedir    &&  $(MAKE) clean && $(MAKE) $(SIM)
 endif
 
+build_sv_anchor: build_c
+ifeq ($(SIM),verilator)
+	cd ../anchor_sim/makedir &&  $(MAKE) clean && $(MAKE) compile_$(SIM)_sv
+else
+	cd ../anchor_sim/makedir &&  $(MAKE) clean && $(MAKE) $(SIM)
+endif
+
 .PHONY: run_initiator
 run_initiator:
 	cd ../initiator/makedir && ./$(SIM)_run
@@ -30,6 +37,10 @@ run_initiator:
 .PHONY: run_target
 run_target:
 	cd ../target/makedir  && ./$(SIM)_run	
+
+.PHONY: run_anchor
+run_anchor:
+	cd ../anchor_sim/makedir  && ./$(SIM)_run
 
 .PHONY:	clean
 clean: 
